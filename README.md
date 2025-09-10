@@ -1,2 +1,2 @@
 # Python_Tutorials
-A repo of tutorials I have done to sharpen my python skills
+A repo of all the Python fundamentals that I should know. Personal Project to sharpen my fundamental skills.
