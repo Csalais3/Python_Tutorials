@@ -153,7 +153,6 @@ class LinkedList():
         return current
         
 
-        
     def visualization(self) -> None:
         if self.size == 0:
             return
@@ -181,4 +180,6 @@ if __name__ == "__main__":
     
     linkedlist.reverse()
     linkedlist.visualization()
+    print(linkedlist.index(0).data)
+
 
