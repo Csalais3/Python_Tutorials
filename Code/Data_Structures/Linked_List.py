@@ -124,7 +124,7 @@ class SinglyLinkedList():
             
         prev._next = nexts
         self.size -= 1
-
+        
     def find(self, data) -> Node:
         if data == None:
             raise TypeError("None type is not allowed")
