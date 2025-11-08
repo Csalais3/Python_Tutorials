@@ -43,9 +43,20 @@ class SinglyLinkedList():
         if self.size == 1:
             if self.head.data == data:
                 del self.head
+                self.head = None
+                self.tail = None
                 self.size -= 1
                 return
             raise ValueError(f"{data} was not found")
+        if self.head.data == data:
+            dummy = self.head
+            self.head = self.head._next
+
+            if self.head is None:
+                self.tail == None
+            del dummy
+            self.size -= 1
+            return
         
         curr = self.head
         while curr._next != None:
@@ -61,20 +72,16 @@ class SinglyLinkedList():
         
         raise ValueError(f"{data} was not found")
         
-    
     def add_index(self, data, index) -> None:
         if data == None:
             raise TypeError("None type is not allowed")
-        if self.size == 0:
-            raise AttributeError("There is no data")
         if index < 0 or index > self.size:
             raise IndexError("Desired index is larger than the size")
         if index == 0:
             dummy = self.head
             self.head = Node(data)
             self.head._next = dummy
-            dummy = None
-            del dummy
+            self.size += 1
             return
         if index == self.size:
             self.add(data)
@@ -89,18 +96,19 @@ class SinglyLinkedList():
         curr._next._next = dummy
         dummy = None
         del dummy
+        self.size += 1
         
     def remove_index(self, index: int) -> None:
-        if index < 0 or index > self.size:
+        if index < 0 or index >= self.size:
             raise IndexError("Index out of range")
         if self.size == 0:
             raise AttributeError("There is no data")
         
         curr = self.head
         if index == 0:
-            if self.size == 1:
-                self.head = None
             self.head = curr._next
+            if self.size == 1:
+                self.tail = None
             del curr
             self.size -=1
             return 
@@ -108,9 +116,14 @@ class SinglyLinkedList():
         for i in range(index):
             prev = curr
             curr = curr._next
-            nexts = curr._next
         
+        nexts = curr._next
+        
+        if curr._next is None:
+            self.tail = prev
+            
         prev._next = nexts
+        self.size -= 1
 
     def find(self, data) -> Node:
         if data == None:
@@ -119,7 +132,7 @@ class SinglyLinkedList():
             raise AttributeError("There is no data")
         
         curr = self.head
-        while curr._next != None:
+        while curr != None:
             if curr.data == data:
                 return curr
             
@@ -129,11 +142,11 @@ class SinglyLinkedList():
         raise ValueError(f"{data} was not found")
     
     def index(self, index: int) -> Node:
-        if index < 0 or index > self.size:
-            ValueError("Index out of range")
+        if index < 0 or index >= self.size:
+            raise ValueError("Index out of range")
         if index == 0:
             return self.head
-        if index == self.size:
+        if index == self.size - 1:
             return self.tail
         
         curr = self.head
@@ -168,7 +181,7 @@ class SinglyLinkedList():
             prev = curr
             curr = next
                     
-        self.head = prev
+        self.tail, self.head = self.head, prev
         
         # tail = self.reverseh(self.head, None)
         # self.head = tail
@@ -198,20 +211,21 @@ class SinglyLinkedList():
             curr = curr._next
         
         print(visual)    
-        
+
+
 class DoublyLinkedList():
     def __init__(self):
         self.head = None
         self.tail = None
         self.size = 0
         
-    def get_head(self) -> Node | None:
+    def getHead(self) -> Node | None:
         return self.head
     
-    def get_tail(self) -> Node | None:
+    def getTail(self) -> Node | None:
         return self.tail
     
-    def get_size(self) -> int:
+    def getSize(self) -> int:
         return self.size
     
     def isEmpty(self) -> bool:
@@ -227,9 +241,10 @@ class DoublyLinkedList():
             return
 
         prev = self.tail
-        prev._next = Node(data)
-        self.tail = self.tail._next
-        self.tail._prev = prev
+        new = Node(data)
+        prev._next = new
+        new._prev = prev
+        self.tail = new
         self.size += 1
         
     def remove(self, data) -> None:
@@ -261,7 +276,7 @@ class DoublyLinkedList():
         
         curr1 = self.tail
         curr2 = self.head
-        while curr1._prev != None and curr2._next != None:
+        while curr1 and curr2 and curr1 != curr2 and curr1._prev != curr2:
             curr1 = curr1._prev
             curr2 = curr2._next
             if curr1.data == data:
@@ -281,6 +296,17 @@ class DoublyLinkedList():
                 self.size -= 1
                 return
 
+        if curr1 == curr2 and curr1.data == data:
+            prev = curr1._prev
+            nexts = curr1._next
+            if prev: 
+                prev._next = nexts
+            if nexts: 
+                nexts._prev = prev
+            del curr1
+            self.size -= 1
+            return
+        
         raise ValueError(f"{data} was not found")  
     
     def add_index(self, index: int, data) -> None:
@@ -288,12 +314,16 @@ class DoublyLinkedList():
             raise ValueError("NoneType data is not allowed")
         if index < 0 or index > self.size:
             raise IndexError(f"{index} is out of range")
+        if self.size == 0:
+            self.add(data)
+            return
         if index == 0:
             head = self.head
             new = Node(data)
             new._next = head
             head._prev = new
             self.head = new 
+            self.size += 1
             return
         if index == self.size:
             tail = self.tail
@@ -301,6 +331,7 @@ class DoublyLinkedList():
             new._prev = tail
             tail._next = new
             self.tail = new
+            self.size += 1
             return
         if self.size == 1:
             self.add(data)
@@ -317,6 +348,7 @@ class DoublyLinkedList():
             curr._prev = new
             new._next = curr
             new._prev = prev
+            self.size += 1
             return
         
         curr = self.head
@@ -329,10 +361,11 @@ class DoublyLinkedList():
         curr._prev = new
         new._next = curr
         new._prev = prev
+        self.size += 1 
         return
     
     def remove_index(self, index: int) -> None:
-        if index < 0 or index > self.size:
+        if index < 0 or index >= self.size:
             raise IndexError(f"{index} is out of range")
         
         if index == 0:
@@ -340,12 +373,14 @@ class DoublyLinkedList():
             self.head = curr._next
             self.head._prev = None
             del curr
+            self.size -= 1
             return
-        if index == self.size:
+        if index == self.size -1:
             curr = self.tail
             self.tail = curr._prev
             self.tail._next = None
             del curr
+            self.size -= 1
             return
 
         if index > self.size // 2:
@@ -358,6 +393,7 @@ class DoublyLinkedList():
             prev._next = nexts
             nexts._prev = prev
             del curr
+            self.size -= 1
             return 
             
         curr = self.head
@@ -369,6 +405,7 @@ class DoublyLinkedList():
         prev._next = nexts
         nexts._prev = prev
         del curr
+        self.size -= 1
         return 
             
     def find(self, data) -> Node:
@@ -382,7 +419,7 @@ class DoublyLinkedList():
         
         curr1 = self.head
         curr2 = self.tail
-        while curr1._next != None and curr2._prev != None:
+        while curr1 and curr2 and curr1 != curr2 and curr1._prev != curr2:
             curr1 = curr1._next
             curr2 = curr2._prev
             
@@ -394,27 +431,25 @@ class DoublyLinkedList():
         raise ValueError(f"{data} was not found")
             
     def index(self, index: int) -> Node:
-        if index < 0 or index > self.size:
-            ValueError("Invalid Index")
+        if index < 0 or index >= self.size:
+            raise ValueError("Invalid Index")
         if index == 0:
             return self.head
-        if index == self.size:
-            return self.tail
         
         if index > self.size // 2:
             curr = self.tail
-            for i in range(self.size - index):
+            for i in range(self.size - index - 1):
                 curr = curr._prev
             
             return curr
         
-        curr1 = self.head
+        curr = self.head
         for i in range(index):
             curr = curr._next
         
         return curr
     
-    def all_data(self):    
+    def all_data(self) -> list:    
         if self.isEmpty():
             return []
         
@@ -426,17 +461,21 @@ class DoublyLinkedList():
         
         return values
     
-    def reverse(self):
+    def reverse(self) -> None:
+        if self.size == 0 or self.size == 1:
+            return 
+    
         curr = self.head
-        
-        for i in range(self.size - 1):
+        prev = None
+        while curr:
+            nexts = curr._next
+            curr._next = prev
+            curr._prev = nexts
             prev = curr
-            curr = curr._next
-           
-            prev._next = prev._prev
-            prev._prev = curr
-        
-        self.head, self.tail = self.tail, self.head
+            curr = nexts
+            
+        self.tail = self.head
+        self.head = prev
             
     def visualize(self):
         out = ""
@@ -448,6 +487,7 @@ class DoublyLinkedList():
             curr = curr._next
         
         print(out)
+        
         
 def SinglyLinkedListTests():
     linkedlist = SinglyLinkedList()
@@ -488,9 +528,9 @@ def DoublyLinkedListTests():
     dlinkedlist.reverse()
     dlinkedlist.visualize()
 
+
 if __name__ == "__main__":
-    #SinglyLinkedListTests()
-    
+    SinglyLinkedListTests()
     DoublyLinkedListTests()
 
 
